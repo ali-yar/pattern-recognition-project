@@ -1,2 +1,2 @@
-# pattern-recognition-project
+# pattern-recognition
 Pattern Recognition Project - MAIA

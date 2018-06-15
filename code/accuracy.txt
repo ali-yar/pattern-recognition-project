@@ -1,0 +1,9 @@
+
+********** Experiment Results **********
+b_norm   l_rate  b_size   acc    auc
+
+False 	 0.0625  64 	 97.7 	    99.62
+False 	 0.0625  128 	 97.899     99.39
+False 	 0.125 	 64 	 98.4 	    99.66
+False 	 0.125 	 128 	 98.2 	    99.22
+

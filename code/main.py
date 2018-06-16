@@ -14,12 +14,14 @@ from makeModel import getModel
 ################################ Set options ##################################
 
 generateData_flag = False
-batch_size = [64, 128]
 batch_norm = [False] # for now, not implemented
-lRatePowers = np.array([4, 3]) # positive integer because.. \|/
-learning_rate = 1/pow(2,lRatePowers) #              .. 1/2^p = 2^(-p)
+batch_size = np.array([2, 16, 128, 1024])
+learning_rate = np.array([ [0.0005, 0.0020, 0.0078, 0.0313], 
+                           [0.0039, 0.0156, 0.0625, 0.2500], 
+                           [0.0313, 0.1250, 0.5000, 2.0000], 
+                           [0.2500, 1.0000, 4.0000, 16.000] ])
 
-epochs = 100
+epochs = 1
 size_image = 16
 
 ################################ Generate data ################################
@@ -55,15 +57,13 @@ if not os.path.exists(plots_dir):
 models_dir = "models/"
 if not os.path.exists(models_dir):
     os.makedirs(models_dir)
-        
-headers = "b_norm   l_rate  b_size   acc    auc\n"
-print(headers)
 
+        
 results = []
 
-for bNorm in batch_norm:
-    for lRate in learning_rate:
-        for bSize in batch_size:  
+for bNorm in batch_norm:         
+    for i, bSize in enumerate(batch_size):
+        for lRate in learning_rate[i]:
             
             # get data
             X_Train, Y_Train, X_Test, Y_Test = getData()
@@ -84,34 +84,42 @@ for bNorm in batch_norm:
             
             # compute accuracy
             acc = metrics.accuracy_score(np.ravel(Y_Test),np.argmax(Y_pred,axis=1))
-            acc = np.round(acc,4) * 100
+            acc = np.round(acc*100,2)
             
             # compute AUC
             fpr, tpr, _ = metrics.roc_curve(Y_Test_cat.ravel(), Y_pred.ravel())
             auc = metrics.auc(fpr, tpr)
-            auc = np.round(auc,4) * 100
+            auc = np.round(auc*100,2)
             
-            res = "{} \t {} \t {} \t {} \t {}".format(bNorm,lRate,bSize,acc,auc)
+            res = "{}\t{}\t{}\t\t{}\t\t{}"
+            res = res.format(bNorm,bSize,lRate,acc,auc)
+            
             results.append(res)
             print(res)
             
             # ROC curve
-            skplt.metrics.plot_roc(Y_Test, Y_pred)
-            plotName = "plot-bnorm{}_lrate{}_bsize{}_acc{}_auc{}.jpg".format(
-                                                    bNorm,lRate,bSize,acc,auc)
-            plt.savefig(plots_dir + plotName)
+#            skplt.metrics.plot_roc(Y_Test, Y_pred)
+#            
+#            plotName = "plot-bnorm{}_lrate{}_bsize{}_acc{}_auc{}.jpg"
+#            plotName = plotName.format(bNorm,bSize,lRate,acc,auc)
+#            
+#            plt.savefig(plots_dir + plotName)
             
             # Save the model
-            modelName = "model-bnorm{}_lrate{}_bsize{}_acc{}_auc{}.tfl".format(
-                                                    bNorm,lRate,bSize,acc,auc)
+            modelName = "model-bnorm{}_bsize{}_lrate{}_acc{}_auc{}.tfl"
+            modelName.format(bNorm,bSize,lRate,acc,auc)
+
             model.save(models_dir + modelName)
     
             # reset tensorflow graph            
             tf.reset_default_graph()
+        results.append("_____________________________________________________")
+        results.append(" ")
 
 # save results to file
 with open("accuracy.txt","a") as f:
     f.write("\n********** Experiment Results **********\n")
+    headers = "b_norm\tb_size\tl_rate\t\tacc\t\tauc\n"
     f.write(headers + "\n")
     for res in results:
         f.write(res + "\n")

@@ -8,7 +8,7 @@ from tflearn.layers.estimator import regression
 from tflearn.data_preprocessing import ImagePreprocessing
 from tflearn.data_augmentation import ImageAugmentation
 
-def getModel(size_image, learning_rate):
+def getModel(size_image, is_dropout, learning_rate, is_batch_norm):
     ###################################
     # Image transformations
     ###################################
@@ -48,6 +48,9 @@ def getModel(size_image, learning_rate):
     # 3: Max pooling layer
     mp1 = max_pool_2d(conv_2, 2)
     
+    # Batch normalization
+    if is_batch_norm : mp1 = tflearn.normalization.batch_normalization(mp1)
+    
     # 4: Convolution layer with 32 filters
     conv_3 = conv_2d(mp1, 32, 3, activation='relu', name='conv_3' )
      
@@ -56,16 +59,19 @@ def getModel(size_image, learning_rate):
      
     # 5: Max pooling layer
     mp2 = max_pool_2d(conv_4, 2)
+    
+    # Batch normalization
+    if is_batch_norm : mp2 = tflearn.normalization.batch_normalization(mp2)
      
     # 6: Fully-connected 256 node layer
     dense1 = fully_connected(mp2, 256, activation='relu' )
      
     # 7: Dropout layer to combat overfitting
-    dp1 = dropout(dense1, 0.5)
+    dp1 = dropout(dense1, 0.5) if is_dropout else dense1
     
     dense2 = fully_connected(dp1, 256, activation='relu' )
     
-    dp2 = dropout(dense2, 0.5)
+    dp2 = dropout(dense2, 0.5) if is_dropout else dense2
     
     # 8: Fully-connected layer with 1 outputs ( binary)
     network = fully_connected(dp2, 2, activation='softmax' )

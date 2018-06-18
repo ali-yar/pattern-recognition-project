@@ -21,7 +21,11 @@ learning_rate = np.array([ [0.0005, 0.0020, 0.0078, 0.0313],
                            [0.0313, 0.1250, 0.5000, 2.0000], 
                            [0.2500, 1.0000, 4.0000, 16.000] ])
 
+batch_size = np.array([16])
+learning_rate = np.array([ [0.0005, 0.0020] ])
+
 epochs = 1
+dropout = False
 size_image = 16
 
 ################################ Generate data ################################
@@ -73,7 +77,7 @@ for bNorm in batch_norm:
             Y_Test_cat = to_categorical(np.ravel(Y_Test),2)
         
             # build model
-            model = getModel(size_image, lRate)
+            model = getModel(size_image, dropout, lRate, bNorm)
             
             # train model
             model.fit(X_Train, Y_Train_cat, batch_size=bSize, n_epoch=epochs,
@@ -107,7 +111,7 @@ for bNorm in batch_norm:
             
             # Save the model
             modelName = "model-bnorm{}_bsize{}_lrate{}_acc{}_auc{}.tfl"
-            modelName.format(bNorm,bSize,lRate,acc,auc)
+            modelName = modelName.format(bNorm,bSize,lRate,acc,auc)
 
             model.save(models_dir + modelName)
     
@@ -123,4 +127,3 @@ with open("accuracy.txt","a") as f:
     f.write(headers + "\n")
     for res in results:
         f.write(res + "\n")
-

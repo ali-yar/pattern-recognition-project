@@ -8,6 +8,7 @@ from makeModel import getModel
 
 match = "models/*.tfl.index"
 
+dropout = False
 size_image = 16
 
 results = []
@@ -36,13 +37,20 @@ for file in glob.glob(match):
     Y_Test_cat = to_categorical(np.ravel(Y_Test),2)
 
     # build model
-    model = getModel(size_image, lRate)
+    model = getModel(size_image, dropout, lRate, bNorm)
     
     # load model weights
     model.load(modelName)  
     
     # test model
-    Y_pred = model.predict(X_Test)
+    Y_pred = np.array([])
+    splits = np.split(X_Test,4)
+    for s in range(4):
+        pred = model.predict(splits[s])
+        if Y_pred.size == 0 :
+            Y_pred = pred
+        else:
+            Y_pred = np.concatenate((Y_pred, pred),axis=0)
     
     # compute accuracy
     acc = metrics.accuracy_score(np.ravel(Y_Test),np.argmax(Y_pred,axis=1))

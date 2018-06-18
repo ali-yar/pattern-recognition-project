@@ -84,7 +84,14 @@ for bNorm in batch_norm:
                                               show_metric=True, shuffle=True)    
             
             # test model
-            Y_pred = model.predict(X_Test)
+            Y_pred = np.array([])
+            splits = np.split(X_Test,4)
+            for s in range(4):
+                pred = model.predict(splits[s])
+                if Y_pred.size == 0 :
+                    Y_pred = pred
+                else:
+                    Y_pred = np.concatenate((Y_pred, pred),axis=0)
             
             # compute accuracy
             acc = metrics.accuracy_score(np.ravel(Y_Test),np.argmax(Y_pred,axis=1))

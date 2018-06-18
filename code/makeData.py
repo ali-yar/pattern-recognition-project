@@ -116,3 +116,19 @@ def getData():
     Y_Test = joblib.load(data_dir + "Y_Test.pkl")
     
     return X_Train, Y_Train, X_Test, Y_Test
+
+
+def getTrainData():
+    data_dir = "data/"
+    X_Train = joblib.load(data_dir + "X_Train.pkl")
+    Y_Train = joblib.load(data_dir + "Y_Train.pkl")
+    
+    return X_Train, Y_Train
+
+
+def getTestData():
+    data_dir = "data/"
+    X_Test = joblib.load(data_dir + "X_Test.pkl")
+    Y_Test = joblib.load(data_dir + "Y_Test.pkl")
+    
+    return X_Test, Y_Test

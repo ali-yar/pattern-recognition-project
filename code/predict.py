@@ -1,5 +1,6 @@
 import glob
 import numpy as np
+import tensorflow as tf
 from tflearn.data_utils import to_categorical
 from sklearn import metrics
 from makeData import getTestData
@@ -12,6 +13,8 @@ size_image = 16
 results = []
 
 for file in glob.glob(match):
+    tf.reset_default_graph()
+    
     modelName = file[:-6]
     
     bnormid = modelName.find("bnorm"); bnormlen = len("bnorm")
@@ -21,6 +24,10 @@ for file in glob.glob(match):
     bNorm = modelName[bnormid + bnormlen : bsizeid]
     bSize = modelName[bsizeid + bsizelen : lrateid]
     lRate = modelName[lrateid + lratelen : modelName.find("_acc")]
+   
+    bNorm = (True if bNorm == 'True' else False)
+    bSize = int(bSize)
+    lRate = float(lRate)
     
     # get data
     X_Test, Y_Test = getTestData()
